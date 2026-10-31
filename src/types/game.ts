@@ -16,12 +16,13 @@ export interface Category {
     name: string;
 }
 
-/** Represents a game with its related category and publisher. */
+/** Represents a game with its related categories and publisher. */
 export interface Game {
     id: number;
     title: string;
     description: string;
     publisher: Publisher | null;
-    category: Category | null;
+    /** Every category associated with the game, including its primary category. */
+    categories: Category[];
     starRating: number | null;
 }

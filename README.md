@@ -42,9 +42,14 @@ npm run build      # prebuild migrates + seeds, then builds the static site
 npm run preview
 ```
 
+## Find games
+
+The home page catalog can be narrowed by selecting one or more categories and/or a publisher. Selecting multiple categories includes games in any selected category; when category matches differ, games matching more selected categories appear first, with alphabetical title order as the tie-breaker. Category and publisher filters can be combined, and **Clear filters** restores the full catalog.
+
 ## Database
 
 The SQLite database is built from `db/games.csv` — there is no live data to migrate.
+Use `|` between category names in a game's `Category` field to associate it with multiple categories (for example, `Strategy|Puzzle`).
 
 ```bash
 npm run db:generate   # generate a migration after editing db/schema.ts

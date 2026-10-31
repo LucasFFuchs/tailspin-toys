@@ -36,6 +36,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 
 - Use TypeScript with explicit types for function parameters and return values, especially in the data layer (`db/`, `src/lib/`)
 - Frontend code (TypeScript, Astro) must pass ESLint checks (`npm run lint`)
+- `All new TypeScript should contain TSDocs comments for documentation purposes.`
 
 ### Data Layer Patterns (Drizzle + Node SQLite)
 
@@ -90,13 +91,13 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 
 The application lives at the repository root:
 
-- `db/`: Drizzle schema, migrations, transforms, seed, and `games.csv`
+- `db/`: Drizzle schema, migrations, transforms, seed, and `games.csv` (`|` separates multiple categories for a game)
 - `src/lib/`: Node SQLite client (`db.ts`) and data-access helpers (`games.ts`)
 - `src/components/`: reusable `.astro` components
 - `src/layouts/`: Astro layout templates
 - `src/pages/`: Astro page routes (`index.astro` listing, `game/[id].astro`, `404.astro`, `about.astro`)
 - `src/styles/`: CSS and Tailwind configuration
-- `src/types/`: TypeScript interfaces (Game, Publisher, Category)
+- `src/types/`: TypeScript interfaces (Game with categories, Publisher, Category)
 - `e2e-tests/`: Playwright E2E tests (home, games, accessibility)
 - `drizzle.config.ts`, `vitest.config.ts`, `astro.config.mjs`, `playwright.config.ts`: tooling config
 - `README.md`: Project documentation
