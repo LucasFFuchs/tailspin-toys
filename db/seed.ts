@@ -3,7 +3,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { eq } from 'drizzle-orm';
 import { createDatabase, type Database } from '../src/lib/db';
-import { categories, games, publishers } from './schema';
+import { categories, gameAdditionalCategories, games, publishers } from './schema';
 import {
     categoryDescription,
     gameDescription,
@@ -62,13 +62,22 @@ export async function seedDatabase(db: Database, csvPath: string = join(here, 'g
         if (existing.length > 0) {
             continue;
         }
-        await db.insert(games).values({
+        const [game] = await db.insert(games).values({
             title: row.title,
             description: gameDescription(row.description),
             starRating: ratingFromTitle(row.title),
-            categoryId: categoryIds.get(row.category)!,
+            categoryId: categoryIds.get(row.categories[0])!,
             publisherId: publisherIds.get(row.publisher)!,
-        });
+        }).returning({ id: games.id });
+        const additionalCategories = row.categories.slice(1);
+        if (additionalCategories.length > 0) {
+            await db.insert(gameAdditionalCategories).values(
+                additionalCategories.map((name) => ({
+                    gameId: game.id,
+                    categoryId: categoryIds.get(name)!,
+                })),
+            );
+        }
     }
 }
 

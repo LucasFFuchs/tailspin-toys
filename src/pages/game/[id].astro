@@ -36,11 +36,11 @@ if (!game) {
         </div>
 
         <div class="flex flex-wrap gap-2 mt-4 mb-6">
-          {game.category && (
+          {game.categories.map((category) => (
             <Tag color="blue" data-testid="game-details-category">
-              {game.category.name}
+              {category.name}
             </Tag>
-          )}
+          ))}
           {game.publisher && (
             <Tag color="purple" data-testid="game-details-publisher">
               {game.publisher.name}

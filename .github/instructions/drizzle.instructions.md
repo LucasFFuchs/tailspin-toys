@@ -9,7 +9,7 @@ The app's data lives in a local SQLite database accessed through **Drizzle ORM**
 
 ## Layout
 
-- `db/schema.ts` — Drizzle table definitions (`publishers`, `categories`, `games`) and inferred row types. The single source of truth for the schema.
+- `db/schema.ts` — Drizzle table definitions (`publishers`, `categories`, `games`, and additional game-category associations) and inferred row types. The single source of truth for the schema.
 - `db/transforms.ts` — **pure** functions (CSV parsing, description building, de-duplication, deterministic `ratingFromTitle`). No DB access — easy to unit test.
 - `db/seed.ts` — idempotent seeding from `db/games.csv` using the transforms.
 - `db/migrate.ts` — applies generated migrations.
@@ -52,6 +52,7 @@ export async function getAllGameIds(db: Database): Promise<number[]> {
 ```
 
 - Always `order by` a stable column (title) so static builds are deterministic.
+- A game's required `categoryId` is its primary category; additional categories are stored in `game_additional_categories`. The CSV `Category` field separates categories with `|`.
 - Map raw rows to the app-facing `Game`/`Publisher`/`Category` types in one place; don't leak Drizzle row shapes into components.
 - Keep ordering/lookup logic in `games.ts`, not in pages.
 

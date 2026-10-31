@@ -19,7 +19,7 @@ function makeGame(overrides: Partial<Game> = {}): Game {
         title: 'Merge Conflict',
         description: 'A co-op game about resolving conflicts.',
         starRating: 4.5,
-        category: { id: 1, name: 'Strategy' },
+        categories: [{ id: 1, name: 'Strategy' }],
         publisher: { id: 1, name: 'Rebase Games' },
         ...overrides,
     };
@@ -46,6 +46,20 @@ describe('toCatalogExport', () => {
             starRating: 4.5,
             ratingLabel: '★★★★½',
         });
+    });
+
+    it('includes all game categories in the catalog entry and category list', () => {
+        const exported = toCatalogExport([
+            makeGame({
+                categories: [
+                    { id: 1, name: 'Strategy' },
+                    { id: 2, name: 'Puzzle' },
+                ],
+            }),
+        ]);
+
+        expect(exported.games[0].category).toBe('Strategy, Puzzle');
+        expect(exported.categories).toEqual(['Puzzle', 'Strategy']);
     });
 
     it('sorts games by title regardless of input order', () => {
@@ -93,9 +107,9 @@ describe('toCatalogExport', () => {
 
     it('lists distinct categories and publishers alphabetically', () => {
         const exported = toCatalogExport([
-            makeGame({ id: 1, category: { id: 2, name: 'Puzzle' }, publisher: { id: 2, name: 'Stack Overflow Studios' } }),
-            makeGame({ id: 2, title: 'Second', category: { id: 1, name: 'Strategy' }, publisher: { id: 1, name: 'Rebase Games' } }),
-            makeGame({ id: 3, title: 'Third', category: { id: 1, name: 'Strategy' }, publisher: { id: 1, name: 'Rebase Games' } }),
+            makeGame({ id: 1, categories: [{ id: 2, name: 'Puzzle' }], publisher: { id: 2, name: 'Stack Overflow Studios' } }),
+            makeGame({ id: 2, title: 'Second', categories: [{ id: 1, name: 'Strategy' }], publisher: { id: 1, name: 'Rebase Games' } }),
+            makeGame({ id: 3, title: 'Third', categories: [{ id: 1, name: 'Strategy' }], publisher: { id: 1, name: 'Rebase Games' } }),
         ]);
 
         expect(exported.categories).toEqual(['Puzzle', 'Strategy']);
@@ -104,9 +118,9 @@ describe('toCatalogExport', () => {
 
     it('sorts distinct categories/publishers by ordinal code unit', () => {
         const exported = toCatalogExport([
-            makeGame({ id: 1, category: { id: 1, name: 'zeta' }, publisher: { id: 1, name: 'zeta' } }),
-            makeGame({ id: 2, title: 'Second', category: { id: 2, name: 'Zeta' }, publisher: { id: 2, name: 'Zeta' } }),
-            makeGame({ id: 3, title: 'Third', category: { id: 3, name: 'Ínca' }, publisher: { id: 3, name: 'Ínca' } }),
+            makeGame({ id: 1, categories: [{ id: 1, name: 'zeta' }], publisher: { id: 1, name: 'zeta' } }),
+            makeGame({ id: 2, title: 'Second', categories: [{ id: 2, name: 'Zeta' }], publisher: { id: 2, name: 'Zeta' } }),
+            makeGame({ id: 3, title: 'Third', categories: [{ id: 3, name: 'Ínca' }], publisher: { id: 3, name: 'Ínca' } }),
         ]);
 
         expect(exported.categories).toEqual(['Zeta', 'zeta', 'Ínca']);
@@ -115,7 +129,7 @@ describe('toCatalogExport', () => {
 
     it('substitutes placeholders for missing relations and omits absent ratings', () => {
         const exported = toCatalogExport([
-            makeGame({ category: null, publisher: null, starRating: null }),
+            makeGame({ categories: [], publisher: null, starRating: null }),
         ]);
 
         const [game] = exported.games;
@@ -128,7 +142,7 @@ describe('toCatalogExport', () => {
     it('never emits null values', () => {
         const exported = toCatalogExport([
             makeGame(),
-            makeGame({ id: 2, title: 'Nulls Everywhere', category: null, publisher: null, starRating: null }),
+            makeGame({ id: 2, title: 'Nulls Everywhere', categories: [], publisher: null, starRating: null }),
         ]);
 
         expect(containsNull(exported)).toBe(false);

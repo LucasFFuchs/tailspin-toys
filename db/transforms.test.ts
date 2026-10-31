@@ -46,10 +46,18 @@ describe('parseGamesCsv', () => {
         expect(rows).toHaveLength(2);
         expect(rows[0]).toEqual({
             title: 'Game A',
-            category: 'Strategy',
+            categories: ['Strategy'],
             publisher: 'Pub One',
             description: 'Desc A',
         });
+    });
+
+    it('parses pipe-separated category names for one game', () => {
+        const [game] = parseGamesCsv(
+            'Title,Category,Publisher,Description\n"Game A","Strategy|Puzzle|Adventure","Pub One","Desc A"',
+        );
+
+        expect(game.categories).toEqual(['Strategy', 'Puzzle', 'Adventure']);
     });
 
     it('skips rows without a title', () => {
@@ -80,9 +88,9 @@ describe('description helpers', () => {
 
 describe('dedupe helpers', () => {
     const rows: GameCsvRow[] = [
-        { title: 'A', category: 'Strategy', publisher: 'P1', description: '' },
-        { title: 'B', category: 'Puzzle', publisher: 'P1', description: '' },
-        { title: 'C', category: 'Strategy', publisher: 'P2', description: '' },
+        { title: 'A', categories: ['Strategy', 'Puzzle'], publisher: 'P1', description: '' },
+        { title: 'B', categories: ['Puzzle'], publisher: 'P1', description: '' },
+        { title: 'C', categories: ['Strategy'], publisher: 'P2', description: '' },
     ];
 
     it('returns distinct categories in first-seen order', () => {

@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, real, primaryKey } from 'drizzle-orm/sqlite-core';
 
 export const publishers = sqliteTable('publishers', {
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -24,6 +24,20 @@ export const games = sqliteTable('games', {
         .notNull()
         .references(() => publishers.id),
 });
+
+/** Stores category associations beyond each game's primary category. */
+export const gameAdditionalCategories = sqliteTable(
+    'game_additional_categories',
+    {
+        gameId: integer('game_id')
+            .notNull()
+            .references(() => games.id),
+        categoryId: integer('category_id')
+            .notNull()
+            .references(() => categories.id),
+    },
+    (table) => [primaryKey({ columns: [table.gameId, table.categoryId] })],
+);
 
 export type PublisherRow = typeof publishers.$inferSelect;
 export type CategoryRow = typeof categories.$inferSelect;

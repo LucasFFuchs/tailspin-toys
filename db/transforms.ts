@@ -4,9 +4,11 @@
  * in isolation and reused by the seed script.
  */
 
+/** A parsed game row from the seed CSV. */
 export interface GameCsvRow {
     title: string;
-    category: string;
+    /** Categories separated by `|` in the CSV. */
+    categories: string[];
     publisher: string;
     description: string;
 }
@@ -87,12 +89,15 @@ export function parseCsv(content: string): Record<string, string>[] {
 export function parseGamesCsv(content: string): GameCsvRow[] {
     return parseCsv(content)
         .filter((row) => (row.Title ?? '').trim().length > 0)
-        .map((row) => ({
-            title: row.Title.trim(),
-            category: row.Category.trim(),
-            publisher: row.Publisher.trim(),
-            description: row.Description.trim(),
-        }));
+        .map((row) => {
+            const categories = row.Category.split('|').map((name) => name.trim());
+            return {
+                title: row.Title.trim(),
+                categories: categories.length > 0 ? categories : [''],
+                publisher: row.Publisher.trim(),
+                description: row.Description.trim(),
+            };
+        });
 }
 
 export function categoryDescription(name: string): string {
@@ -109,7 +114,7 @@ export function gameDescription(rawDescription: string): string {
 
 /** Distinct category names in first-seen order. */
 export function uniqueCategories(rows: GameCsvRow[]): string[] {
-    return [...new Set(rows.map((row) => row.category))];
+    return [...new Set(rows.flatMap((row) => row.categories))];
 }
 
 /** Distinct publisher names in first-seen order. */

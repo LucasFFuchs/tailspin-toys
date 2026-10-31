@@ -24,6 +24,34 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should combine category and publisher filters and clear them', async ({ page }) => {
+    await page.goto('/');
+
+    await test.step('Select multiple categories to show games matching either category', async () => {
+      await page.getByRole('checkbox', { name: 'Strategy' }).check();
+      await page.getByRole('checkbox', { name: 'Puzzle' }).check();
+      await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(8);
+    });
+
+    await test.step('Narrow the results to one publisher', async () => {
+      await page.getByLabel('Publisher').selectOption({ label: 'CodeForge Studios' });
+
+      const visibleCards = page.locator('[data-testid="game-card"]:visible');
+      await expect(visibleCards).toHaveCount(2);
+      await expect(visibleCards).toContainText(['Code Puzzle Chronicles', 'DevOps Dominion']);
+      await expect(page.getByTestId('game-results-count')).toHaveText('Showing 2 of 21 games');
+    });
+
+    await test.step('Clear filters to restore the full catalog', async () => {
+      await page.getByRole('button', { name: 'Clear filters' }).click();
+
+      await expect(page.locator('[data-testid="game-card"]:visible')).toHaveCount(21);
+      await expect(page.getByTestId('game-results-count')).toHaveText('Showing 21 of 21 games');
+      await expect(page.getByRole('checkbox', { name: 'Strategy' })).not.toBeChecked();
+      await expect(page.getByLabel('Publisher')).toHaveValue('');
+    });
+  });
+
   test('should display each game rating out of five on listing cards', async ({ page }) => {
     await page.goto('/');
 

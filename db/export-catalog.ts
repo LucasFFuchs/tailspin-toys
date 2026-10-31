@@ -57,7 +57,7 @@ function mapCatalogGame(game: Game): CatalogGame {
         id: game.id,
         title: game.title,
         description: game.description,
-        category: game.category?.name ?? UNKNOWN_CATEGORY,
+        category: game.categories.map((category) => category.name).join(', ') || UNKNOWN_CATEGORY,
         publisher: game.publisher?.name ?? UNKNOWN_PUBLISHER,
         ...(game.starRating !== null ? { starRating: game.starRating } : {}),
         ratingLabel: formatStarRating(game.starRating),
@@ -91,7 +91,7 @@ export function toCatalogExport(games: Game[]): CatalogExport {
         source: 'Tailspin Toys crowdfunding catalog',
         note: GROUNDING_NOTE,
         gameCount: entries.length,
-        categories: distinctSorted(entries.map((entry) => entry.category)),
+        categories: distinctSorted(games.flatMap((game) => game.categories.map((category) => category.name))),
         publishers: distinctSorted(entries.map((entry) => entry.publisher)),
         games: entries,
     };
